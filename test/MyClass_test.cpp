@@ -23,7 +23,7 @@ TEST(TestSuite, test_case_1) {
   int c = my_class.add_two_ints(a, b);
   std::cout << "\n\n\nThis comes form inside of one test case\n\n\n";
 
-  EXPECT_EQ(c, 3);
+  EXPECT_EQ(c, 4);
 }
 
 int main(int argc, char **argv) {

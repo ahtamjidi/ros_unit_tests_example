@@ -1,0 +1,39 @@
+name: ROS CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      ROS_CI_DESKTOP: "`lsb_release -cs`"
+      ROS_DISTRO: noetic
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Install ROS
+      - uses: ros-tooling/setup-ros@v0.4
+          with:
+            required-ros-distributions: noetic
+      - run: "source /opt/ros/noetic/setup.bash && rosnode --help"
+      - name: Install ROS packages with rosdep
+        run: |
+          source /opt/ros/$ROS_DISTRO/setup.bash
+          sudo rosdep init
+          rosdep update
+          ln -s $GITHUB_WORKSPACE ~/catkin_ws/src/robot
+          cd ~/catkin_ws
+          rosdep install --from-paths src --ignore-src -ry
+      - name: catkin build
+        run: |
+          source /opt/ros/$ROS_DISTRO/setup.bash
+          cd ~/catkin_ws
+          catkin build --no-status
+          source devel/setup.bash
